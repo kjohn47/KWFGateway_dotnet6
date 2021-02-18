@@ -1,1 +1,0 @@
-﻿Add here json configurations to be used on the gateway
