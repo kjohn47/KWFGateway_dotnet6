@@ -1,0 +1,148 @@
+[2021-02-18T10:06:05.914] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T10:06:05.974] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T10:06:06.017] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T10:06:06.025] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 49.3650ms 
+[2021-02-18T12:25:57.463] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T12:25:57.620] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T12:25:57.649] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T12:25:57.656] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 35.2185ms 
+[2021-02-18T12:43:06.098] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T12:43:06.174] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T12:43:06.189] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T12:43:06.195] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 21.6946ms 
+[2021-02-18T13:55:26.642] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T13:55:26.727] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T13:55:26.743] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T13:55:26.749] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 22.8823ms 
+[2021-02-18T14:02:23.587] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T14:02:23.666] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T14:02:23.711] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T14:02:23.717] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 51.6888ms 
+[2021-02-18T14:29:22.553] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T14:29:22.631] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T14:29:22.670] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T14:29:22.678] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 47.8651ms 
+[2021-02-18T14:29:22.682] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 51.6040ms 
+[2021-02-18T14:42:33.484] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T14:42:33.574] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T14:42:33.613] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T14:42:33.619] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 46.8354ms 
+[2021-02-18T17:53:26.779] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T17:53:26.839] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T17:53:26.887] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T17:53:26.892] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 54.1541ms 
+[2021-02-18T17:53:26.898] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 56.6127ms 
+[2021-02-18T18:13:11.759] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:13:11.828] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:13:11.855] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T18:13:11.864] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 37.9971ms 
+[2021-02-18T18:25:10.318] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:25:10.375] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:25:10.417] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T18:25:10.424] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 49.2952ms 
+[2021-02-18T18:31:02.932] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:31:03.014] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:31:03.031] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T18:31:03.036] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 22.4800ms 
+[2021-02-18T18:36:31.520] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:36:31.599] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:36:31.616] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T18:36:31.622] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 23.6490ms 
+[2021-02-18T18:37:08.393] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:37:08.406] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T18:37:08.410] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 17.0610ms 
+[2021-02-18T18:37:33.549] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:37:33.628] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:37:33.661] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T18:37:33.672] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 44.5805ms 
+[2021-02-18T18:45:19.832] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:45:19.928] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:45:19.959] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T18:45:19.990] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 63.5094ms 
+[2021-02-18T18:49:43.744] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:49:43.841] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:49:43.854] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T18:49:43.868] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 27.3923ms 
+[2021-02-18T18:49:50.241] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:49:50.251] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T18:49:50.257] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 17.0177ms 
+[2021-02-18T18:54:00.317] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:54:00.414] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T18:54:00.446] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T18:54:00.473] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 59.9578ms 
+[2021-02-18T18:54:21.443] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:54:21.523] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:54:21.548] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T18:54:21.579] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 54.3642ms 
+[2021-02-18T18:58:26.514] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:58:26.592] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T18:58:26.629] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T18:58:26.635] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 43.6472ms 
+[2021-02-18T18:59:03.505] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T18:59:03.559] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - 
+[2021-02-18T18:59:03.600] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T18:59:03.606] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 46.3768ms 
+[2021-02-18T19:04:09.292] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T19:04:09.347] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T19:04:09.408] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T19:04:09.438] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 91.3693ms 
+[2021-02-18T19:12:46.761] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T19:12:46.817] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T19:12:46.854] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T19:12:46.888] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 71.0642ms 
+[2021-02-18T19:16:18.839] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T19:16:18.894] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T19:16:18.927] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T19:16:18.935] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 41.8473ms 
+[2021-02-18T19:24:10.594] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T19:24:10.653] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T19:24:10.697] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T19:24:10.716] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 62.2422ms 
+[2021-02-18T20:23:46.210] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:23:46.295] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:23:46.311] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T20:23:46.317] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 23.2031ms 
+[2021-02-18T20:24:22.494] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:24:22.557] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:24:22.587] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T20:24:22.594] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 38.4883ms 
+[2021-02-18T20:25:47.917] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:25:48.002] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T20:25:48.048] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T20:25:48.055] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 53.1014ms 
+[2021-02-18T20:30:07.625] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:30:07.681] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:30:07.709] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A' 
+[2021-02-18T20:30:07.716] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 35.3798ms 
+[2021-02-18T20:35:52.851] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:35:52.952] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:35:52.966] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T20:35:52.981] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 28.8422ms 
+[2021-02-18T20:43:03.903] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:43:04.006] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:43:04.031] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T20:43:04.073] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 67.4793ms 
+[2021-02-18T20:45:21.676] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:45:21.758] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T20:45:21.780] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T20:45:21.787] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 29.9792ms 
+[2021-02-18T20:46:15.461] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:46:15.538] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T20:46:15.562] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T20:46:15.570] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - - 200 1061588 application/javascript 32.8464ms 
+[2021-02-18T20:50:02.978] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T20:50:03.053] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T20:50:03.080] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T20:50:03.085] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 33.5467ms 
+[2021-02-18T21:03:31.807] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T21:03:31.883] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T21:03:31.909] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T21:03:31.922] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - - 200 332952 application/javascript 37.8953ms 
+[2021-02-18T21:04:42.812] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T21:04:42.895] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-standalone-preset.js - - 
+[2021-02-18T21:04:42.913] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A' 
+[2021-02-18T21:04:42.919] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 23.8807ms 
+[2021-02-18T21:06:07.360] Request starting HTTP/2 GET https://localhost:14700/swagger/index.html - - 
+[2021-02-18T21:06:07.424] Request starting HTTP/2 GET https://localhost:14700/swagger/swagger-ui-bundle.js - - 
+[2021-02-18T21:06:07.463] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A' 
+[2021-02-18T21:06:07.470] Request finished HTTP/2 GET https://localhost:14700/swagger/swagger-ui.css - - - 200 143212 text/css 47.0607ms 

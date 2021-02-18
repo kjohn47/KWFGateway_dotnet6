@@ -1,0 +1,21 @@
+{
+  "ServerName": "Homepage",
+  "ServerUrl": "https://localhost:14747",
+  "InternalTokenKey": "APICOMMONSIGNEDKEY",
+  "InternalTokenIdentifier": "AccessToken",
+  "ForceDisableSSL": true,
+  "RouteConfiguration": [
+    {
+      "Route": "homepage/translations",
+      "Method": "GET",
+      "NeedAuthorization": false,
+      "NeedRequestBody": false
+    },
+    {
+      "Route": "homepage/translations/*",
+      "Method": "GET",
+      "NeedAuthorization": false,
+      "NeedRequestBody": false
+    }
+  ]
+}
