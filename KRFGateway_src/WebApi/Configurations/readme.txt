@@ -14,7 +14,11 @@ Template:
       "Route": "",
       "Method": "",
       "NeedAuthorization": false,
-      "NeedRequestBody": false
+      "NeedRequestBody": false,
+      "Exclude" : [
+        "",
+        ""
+      ]
     }
   ]
 }

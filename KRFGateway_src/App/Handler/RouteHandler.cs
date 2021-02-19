@@ -113,7 +113,8 @@
                         {
                             for ( int i = 0; i < routeParts.Length; i++ )
                             {
-                                if ( !( routeParts[ i ].Equals( "*" ) || routeParts[ i ].Equals( urlParts[ i ], StringComparison.InvariantCultureIgnoreCase ) ) )
+                                if ( !( ( routeParts[ i ].Equals( "*" ) && ( x.Exclude == null || !x.Exclude.Any( e => e.Equals( urlParts[ i ], StringComparison.InvariantCultureIgnoreCase ) ) ) ) ||
+                                routeParts[ i ].Equals( urlParts[ i ], StringComparison.InvariantCultureIgnoreCase ) ) )
                                 {
                                     return false;
                                 }

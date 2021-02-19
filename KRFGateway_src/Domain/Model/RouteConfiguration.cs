@@ -1,4 +1,6 @@
-﻿namespace KRFGateway.Domain.Model
+﻿using System.Collections.Generic;
+
+namespace KRFGateway.Domain.Model
 {
     public class RouteConfiguration
     {
@@ -6,6 +8,7 @@
         public string Route { get; set; }
         public HttpMethodEnum Method { get; set; }
         public bool NeedAuthorization { get; set; }
+        public IEnumerable<string> Exclude { get; set; }
 
         public bool NeedRequestBody
         {
