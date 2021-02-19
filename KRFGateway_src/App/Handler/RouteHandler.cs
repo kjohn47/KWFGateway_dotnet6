@@ -138,7 +138,7 @@
                 httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                 return new RequestHandlerResponse
                 {
-                    Error = new ErrorOut( HttpStatusCode.Forbidden, "You need to be authenticated to access that route" )
+                    Error = new ErrorOut( HttpStatusCode.Unauthorized, "You need to be authenticated to access that route" )
                 };
             }
 
