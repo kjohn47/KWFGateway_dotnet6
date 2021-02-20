@@ -10,6 +10,7 @@ namespace KRFGateway.WebApi
 
     using KRFGateway.App.Constants;
     using KRFGateway.App.Handler;
+    using KRFGateway.Domain.Model;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -26,13 +27,14 @@ namespace KRFGateway.WebApi
             this._apiSettings = configuration.GetSection( KRFApiSettings.AppConfiguration_Key ).Get<AppConfiguration>();
             this._requestContext = configuration.GetSection( KRFApiSettings.RequestContext_Key ).Get<RequestContext>();
             this._enableLogs = configuration.GetValue( KRFApiSettings.LogsOnPrd_Key, false );
-
+            this._sessionServer = configuration.GetSection( AppConstants.SessionServerKey ).Get<SessionServer>();
             this.HostingEnvironment = env;
         }
 
         private readonly AppConfiguration _apiSettings;
         private readonly RequestContext _requestContext;
         private readonly bool _enableLogs;
+        private readonly SessionServer _sessionServer;
 
         public IWebHostEnvironment HostingEnvironment { get; }
         public IConfiguration Configuration { get; }
@@ -60,6 +62,7 @@ namespace KRFGateway.WebApi
             services.SwaggerInit( this._apiSettings.ApiName, this._apiSettings.TokenIdentifier );
 
             services.AddSingleton<IServerConfigurationHandler>( new ServerConfigurationHandler( this.Configuration.GetValue<string>( AppConstants.ConfigurationPathKey, "Configurations" ) ) );
+            services.AddSingleton( _sessionServer );
             services.AddScoped<IRouteHandler, RouteHandler>();
         }
 

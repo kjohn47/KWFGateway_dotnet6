@@ -13,6 +13,7 @@
     using KRFCommon.Constants;
     using KRFCommon.Context;
     using KRFCommon.CQRS.Common;
+    using KRFCommon.JSON;
 
     using KRFGateway.Domain.Model;
 
@@ -23,12 +24,14 @@
         private readonly IServerConfigurationHandler serverConfigurationHandler;
         private readonly IHttpContextAccessor httpContext;
         private readonly IUserContext userContext;
+        private readonly SessionServer sessionServer;
 
-        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContext _userContext )
+        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContext _userContext, SessionServer _sessionServer )
         {
             this.serverConfigurationHandler = _serverConfigurationHandler;
             this.httpContext = _httpContext;
             this.userContext = _userContext;
+            this.sessionServer = _sessionServer;
         }
 
         public async Task<RequestHandlerResponse> HandleRequest( HttpMethodEnum method, string serverName )
@@ -134,9 +137,9 @@
                 };
             }
 
-            if ( ( userContext == null || userContext.Claim == Claims.NotLogged ) && routeConfig.NeedAuthorization )
+            if ( ( this.userContext == null || this.userContext.Claim == Claims.NotLogged ) && routeConfig.NeedAuthorization )
             {
-                httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                 return new RequestHandlerResponse
                 {
                     Error = new ErrorOut( HttpStatusCode.Unauthorized, "You need to be authenticated to access that route" )
@@ -151,12 +154,65 @@
                 };
             }
 
-            if ( userContext != null && userContext.Claim != Claims.NotLogged )
+            if ( this.userContext != null && this.userContext.Claim != Claims.NotLogged )
             {
                 //validate user session and claims, extend session
-                await Task.Yield();
+                using ( var sessionHandler = new HttpClientHandler() )
+                {
+                    if ( this.sessionServer.ForceDisableSSL.HasValue && this.sessionServer.ForceDisableSSL.Value )
+                    {
+                        sessionHandler.ServerCertificateCustomValidationCallback = ( message, cert, chain, err ) =>
+                        {
+                            return true;
+                        };
+                    }
+                    else
+                    {
+                        if ( !string.IsNullOrEmpty( this.sessionServer.CertificatePath ) )
+                        {
+                            if ( !string.IsNullOrEmpty( this.sessionServer.CertificateKey ) )
+                            {
+
+                            }
+                        }
+                    }
+                    using ( var sessionClient = new HttpClient( sessionHandler ) )
+                    {
+                        sessionClient.BaseAddress = null;
+                        sessionClient.DefaultRequestHeaders.Accept.Append( new MediaTypeWithQualityHeaderValue( KRFConstants.JsonContentType ) );
+                        if ( this.sessionServer.Timeout.HasValue )
+                        {
+                            sessionClient.Timeout = new TimeSpan( 0, 0, this.sessionServer.Timeout.Value );
+                        }
+
+                        using ( HttpContent sessionReq = new StringContent( JsonSerializer.Serialize( this.userContext, KRFJsonSerializerOptions.GetJsonSerializerOptions() ), Encoding.UTF8 ) )
+                        {
+                            sessionReq.Headers.ContentType = new MediaTypeHeaderValue( KRFConstants.JsonContentUtf8Type );
+                            var sessionResponse = await sessionClient.PostAsync( this.sessionServer.CheckSessionUrl, sessionReq );
+
+                            if ( sessionResponse == null || sessionResponse.Content == null )
+                            {
+                                return new RequestHandlerResponse
+                                {
+                                    Error = new ErrorOut( HttpStatusCode.BadRequest, "Session server didn't respond in time" )
+                                };
+                            }
+
+                            var sessionInfo = await JsonSerializer.DeserializeAsync<CheckSessionResult>( await sessionResponse.Content.ReadAsStreamAsync() );
+                            if( sessionInfo == null || ( sessionInfo.HasError.HasValue && sessionInfo.HasError.Value ) )
+                            {
+                                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                                return new RequestHandlerResponse
+                                {
+                                    Error = sessionInfo.Error
+                                };
+                            }
+                        }
+                    }
+                }
+
                 //generate api specific token
-                token = KRFJwtConstants.Bearer + Jose.JWT.Encode( userContext, Encoding.UTF8.GetBytes( serverConfig.InternalTokenKey ), Jose.JwsAlgorithm.HS256 );
+                token = KRFJwtConstants.Bearer + Jose.JWT.Encode( this.userContext, Encoding.UTF8.GetBytes( serverConfig.InternalTokenKey ), Jose.JwsAlgorithm.HS256 );
             }
 
             //Call api
@@ -238,7 +294,7 @@
 
             if ( response.Headers.WwwAuthenticate.Count > 0 )
             {
-                httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.Headers.WwwAuthenticate.First().ToString() );
+                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.Headers.WwwAuthenticate.First().ToString() );
             }
 
             return new RequestHandlerResponse
