@@ -2,6 +2,8 @@
 {
     using System.Threading.Tasks;
 
+    using KRFCommon.Proxy;
+
     using KRFGateway.Domain.Model;
     public interface IRouteHandler
     {
