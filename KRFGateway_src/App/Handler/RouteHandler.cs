@@ -129,7 +129,7 @@
             {
                 return new RequestHandlerResponse
                 {
-                    Error = new ErrorOut( HttpStatusCode.NotFound, "Could not find requested route" )
+                    Error = new ErrorOut( HttpStatusCode.NotFound, "Could not find requested route", ResponseErrorType.Application )
                 };
             }
 
@@ -138,7 +138,7 @@
                 this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                 return new RequestHandlerResponse
                 {
-                    Error = new ErrorOut( HttpStatusCode.Unauthorized, "You need to be authenticated to access that route" )
+                    Error = new ErrorOut( HttpStatusCode.Unauthorized, "You need to be authenticated to access that route", ResponseErrorType.Application )
                 };
             }
 
@@ -146,7 +146,7 @@
             {
                 return new RequestHandlerResponse
                 {
-                    Error = new ErrorOut( HttpStatusCode.BadRequest, "Missing Request body (JSON Format)" )
+                    Error = new ErrorOut( HttpStatusCode.BadRequest, "Missing Request body (JSON Format)", ResponseErrorType.Proxy )
                 };
             }
 
