@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using KRFCommon.Proxy;
+
 namespace KRFGateway.Domain.Model
 {
     public class RouteConfiguration
