@@ -4,16 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Text.Json;
     using System.Threading.Tasks;
 
     using KRFCommon.Constants;
     using KRFCommon.Context;
     using KRFCommon.CQRS.Common;
-    using KRFCommon.JSON;
+    using KRFCommon.Proxy;
 
     using KRFGateway.Domain.Model;
 
@@ -157,150 +153,57 @@
             if ( this.userContext != null && this.userContext.Claim != Claims.NotLogged )
             {
                 //validate user session and claims, extend session
-                using ( var sessionHandler = new HttpClientHandler() )
+                var sessionResponse = await KRFRestHandler.RequestHttp<IUserContext, CheckSessionResult>( new KRFHttpRequestWithBody<IUserContext>
                 {
-                    if ( this.sessionServer.ForceDisableSSL.HasValue && this.sessionServer.ForceDisableSSL.Value )
+                    Url = this.sessionServer.CheckSessionUrl,
+                    CertificateKey = this.sessionServer.CertificateKey,
+                    CertificatePath = this.sessionServer.CertificatePath,
+                    ForceDisableSSL = this.sessionServer.ForceDisableSSL,
+                    Method = HttpMethodEnum.POST,
+                    Timeout = this.sessionServer.Timeout,
+                    Body = this.userContext
+                } );
+
+                if ( sessionResponse.HasError || !sessionResponse.Response.Success )
+                {
+                    this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                    return new RequestHandlerResponse
                     {
-                        sessionHandler.ServerCertificateCustomValidationCallback = ( message, cert, chain, err ) =>
-                        {
-                            return true;
-                        };
-                    }
-                    else
-                    {
-                        if ( !string.IsNullOrEmpty( this.sessionServer.CertificatePath ) )
-                        {
-                            if ( !string.IsNullOrEmpty( this.sessionServer.CertificateKey ) )
-                            {
-
-                            }
-                        }
-                    }
-                    using ( var sessionClient = new HttpClient( sessionHandler ) )
-                    {
-                        sessionClient.BaseAddress = null;
-                        sessionClient.DefaultRequestHeaders.Accept.Append( new MediaTypeWithQualityHeaderValue( KRFConstants.JsonContentType ) );
-                        if ( this.sessionServer.Timeout.HasValue )
-                        {
-                            sessionClient.Timeout = new TimeSpan( 0, 0, this.sessionServer.Timeout.Value );
-                        }
-
-                        using ( HttpContent sessionReq = new StringContent( JsonSerializer.Serialize( this.userContext, KRFJsonSerializerOptions.GetJsonSerializerOptions() ), Encoding.UTF8 ) )
-                        {
-                            sessionReq.Headers.ContentType = new MediaTypeHeaderValue( KRFConstants.JsonContentUtf8Type );
-                            var sessionResponse = await sessionClient.PostAsync( this.sessionServer.CheckSessionUrl, sessionReq );
-
-                            if ( sessionResponse == null || sessionResponse.Content == null )
-                            {
-                                return new RequestHandlerResponse
-                                {
-                                    Error = new ErrorOut( HttpStatusCode.BadRequest, "Session server didn't respond in time" )
-                                };
-                            }
-
-                            var sessionInfo = await JsonSerializer.DeserializeAsync<CheckSessionResult>( await sessionResponse.Content.ReadAsStreamAsync() );
-                            if( sessionInfo == null || ( sessionInfo.HasError.HasValue && sessionInfo.HasError.Value ) )
-                            {
-                                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
-                                return new RequestHandlerResponse
-                                {
-                                    Error = sessionInfo.Error
-                                };
-                            }
-                        }
-                    }
+                        Error = sessionResponse.HasError ? sessionResponse.Error : sessionResponse.Error,
+                        HttpStatusCode = sessionResponse.HttpStatus
+                    };
                 }
 
                 //generate api specific token
-                token = KRFJwtConstants.Bearer + Jose.JWT.Encode( this.userContext, Encoding.UTF8.GetBytes( serverConfig.InternalTokenKey ), Jose.JwsAlgorithm.HS256 );
+                token = KRFJwt.GetSignedBearerTokenFromContext( this.userContext, serverConfig.InternalTokenKey );
             }
 
             //Call api
-            HttpResponseMessage response = null;
-            using ( var handler = new HttpClientHandler() )
+            var response = await KRFRestHandler.RequestHttp<string, object>( new KRFHttpRequestWithBody<string>
             {
-                if ( serverConfig.ForceDisableSSL )
-                {
-                    handler.ServerCertificateCustomValidationCallback = ( message, cert, chain, err ) =>
-                    {
-                        return true;
-                    };
-                }
-                else
-                {
-                    if ( !string.IsNullOrEmpty( serverConfig.CertificatePath ) )
-                    {
-                        if ( !string.IsNullOrEmpty( serverConfig.CertificateKey ) )
-                        {
+                Url = serverConfig.ServerUrl,
+                CertificateKey = serverConfig.CertificateKey,
+                CertificatePath = serverConfig.CertificatePath,
+                ForceDisableSSL = serverConfig.ForceDisableSSL,
+                KRFBearerToken = token,
+                KRFBearerTokenHeader = serverConfig.InternalTokenIdentifier,
+                Method = method,
+                QueryString = queryString,
+                Route = route,
+                Timeout = serverConfig.RequestTimeOut,
+                Body = body
+            } );
 
-                        }
-                    }
-                }
-
-                using ( var client = new HttpClient( handler ) )
-                {
-                    client.BaseAddress = new Uri( serverConfig.ServerUrl.EndsWith( "/" ) ? serverConfig.ServerUrl : $"{serverConfig.ServerUrl}/" );
-                    if ( !string.IsNullOrEmpty( token ) )
-                    {
-                        client.DefaultRequestHeaders.Add( serverConfig.InternalTokenIdentifier, token );
-                    }
-
-                    if ( serverConfig.RequestTimeOut.HasValue )
-                    {
-                        client.Timeout = new TimeSpan( 0, 0, serverConfig.RequestTimeOut.Value );
-                    }
-
-                    client.DefaultRequestHeaders.Accept.Append( new MediaTypeWithQualityHeaderValue( "*/*" ) );
-
-                    switch ( method )
-                    {
-                        case HttpMethodEnum.GET:
-                        {
-                            response = await client.GetAsync( string.Format( "{0}{1}", route, queryString ) );
-                            break;
-                        }
-                        case HttpMethodEnum.DELETE:
-                        {
-                            response = await client.DeleteAsync( string.Format( "{0}{1}", route, queryString ) );
-                            break;
-                        }
-                        case HttpMethodEnum.POST:
-                        case HttpMethodEnum.PUT:
-                        {
-                            using HttpContent req = new StringContent( body ?? string.Empty, Encoding.UTF8 );
-                            req.Headers.ContentType = new MediaTypeHeaderValue( KRFConstants.JsonContentUtf8Type );
-
-                            if ( method.Equals( HttpMethodEnum.POST ) )
-                            {
-                                response = await client.PostAsync( string.Format( "{0}{1}", route, queryString ), req );
-                            }
-                            else
-                            {
-                                response = await client.PutAsync( string.Format( "{0}{1}", route, queryString ), req );
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ( response == null || response.Content == null )
+            if ( response?.ResponseHeaders?.WwwAuthenticate?.Count > 0 )
             {
-                return new RequestHandlerResponse
-                {
-                    Error = new ErrorOut( HttpStatusCode.BadRequest, "Server failed to retrieve response" )
-                };
-            }
-
-            if ( response.Headers.WwwAuthenticate.Count > 0 )
-            {
-                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.Headers.WwwAuthenticate.First().ToString() );
+                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.ResponseHeaders.WwwAuthenticate.First().ToString() );
             }
 
             return new RequestHandlerResponse
             {
-                Response = await JsonSerializer.DeserializeAsync<object>( await response.Content.ReadAsStreamAsync() ),
-                ResponseHttpStatus = ( int ) response.StatusCode
+                Response = response.Response,
+                HttpStatusCode = response.HttpStatus,
+                Error = response.Error
             };
         }
     }
