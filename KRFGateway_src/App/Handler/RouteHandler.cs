@@ -175,7 +175,7 @@
                 }
 
                 //generate api specific token
-                token = KRFJwt.GetSignedBearerTokenFromContext( this.userContext, serverConfig.InternalTokenKey );
+                token = KRFJwt.GetSignedBearerTokenFromContext( this.userContext, serverConfig.InternalTokenKey, DateTime.Now.AddMinutes( 5 ) );
             }
 
             //Call api
