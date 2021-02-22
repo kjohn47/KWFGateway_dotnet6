@@ -45,7 +45,7 @@
         }
 
         [HttpGet( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
-        public async Task<IActionResult> GetServerActionRoute(
+        public async Task<IActionResult> GetServerActionRouteParam(
         [FromServices] IRouteHandler routeHandler,
         [FromRoute] string serverName,
         [FromRoute] string serverAction,
@@ -85,7 +85,7 @@
             return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.POST, body?.ToString(), serverName, serverAction, serverRoute ) );
         }
         [HttpPost( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
-        public async Task<IActionResult> PostServerActionRoute(
+        public async Task<IActionResult> PostServerActionRouteParam(
         [FromServices] IRouteHandler routeHandler,
         [FromRoute] string serverName,
         [FromRoute] string serverAction,
@@ -127,7 +127,7 @@
         }
 
         [HttpPut( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
-        public async Task<IActionResult> PutServerActionRoute(
+        public async Task<IActionResult> PutServerActionRouteParam(
         [FromServices] IRouteHandler routeHandler,
         [FromRoute] string serverName,
         [FromRoute] string serverAction,
@@ -166,7 +166,7 @@
         }
 
         [HttpDelete( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
-        public async Task<IActionResult> DeleteServerActionRoute(
+        public async Task<IActionResult> DeleteServerActionRouteParam(
         [FromServices] IRouteHandler routeHandler,
         [FromRoute] string serverName,
         [FromRoute] string serverAction,
