@@ -20,57 +20,57 @@
         private readonly IServerConfigurationHandler serverConfigurationHandler;
         private readonly IHttpContextAccessor httpContext;
         private readonly IUserContext userContext;
-        private readonly SessionServer sessionServer;
+        private readonly GatewaySettings gatewaySettings;
 
-        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContext _userContext, SessionServer _sessionServer )
+        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContext _userContext, GatewaySettings _gatewaySettings )
         {
             this.serverConfigurationHandler = _serverConfigurationHandler;
             this.httpContext = _httpContext;
             this.userContext = _userContext;
-            this.sessionServer = _sessionServer;
+            this.gatewaySettings = _gatewaySettings;
         }
 
-        public async Task<RequestHandlerResponse> HandleRequest( HttpMethodEnum method, string serverName )
+        public async Task<RequestHandlerResponse> HandleRequest( bool open, HttpMethodEnum method, string serverName )
         {
-            return await this.HandleRequestInternal( method, serverName );
+            return await this.HandleRequestInternal( open, method, serverName );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequest( HttpMethodEnum method, string serverName, string serverAction )
+        public async Task<RequestHandlerResponse> HandleRequest( bool open, HttpMethodEnum method, string serverName, string serverAction )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequest( HttpMethodEnum method, string serverName, string serverAction, string serverRoute )
+        public async Task<RequestHandlerResponse> HandleRequest( bool open, HttpMethodEnum method, string serverName, string serverAction, string serverRoute )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction, serverRoute );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction, serverRoute );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequest( HttpMethodEnum method, string serverName, string serverAction, string serverRoute, string serverRouteParam )
+        public async Task<RequestHandlerResponse> HandleRequest( bool open, HttpMethodEnum method, string serverName, string serverAction, string serverRoute, string serverRouteParam )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction, serverRoute, serverRouteParam );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction, serverRoute, serverRouteParam );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequestWithBody( HttpMethodEnum method, string body, string serverName )
+        public async Task<RequestHandlerResponse> HandleRequestWithBody( bool open, HttpMethodEnum method, string body, string serverName )
         {
-            return await this.HandleRequestInternal( method, serverName, null, null, null, body );
+            return await this.HandleRequestInternal( open, method, serverName, null, null, null, body );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequestWithBody( HttpMethodEnum method, string body, string serverName, string serverAction )
+        public async Task<RequestHandlerResponse> HandleRequestWithBody( bool open, HttpMethodEnum method, string body, string serverName, string serverAction )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction, null, null, body );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction, null, null, body );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequestWithBody( HttpMethodEnum method, string body, string serverName, string serverAction, string serverRoute )
+        public async Task<RequestHandlerResponse> HandleRequestWithBody( bool open, HttpMethodEnum method, string body, string serverName, string serverAction, string serverRoute )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction, serverRoute, null, body );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction, serverRoute, null, body );
         }
 
-        public async Task<RequestHandlerResponse> HandleRequestWithBody( HttpMethodEnum method, string body, string serverName, string serverAction, string serverRoute, string serverRouteParam )
+        public async Task<RequestHandlerResponse> HandleRequestWithBody( bool open, HttpMethodEnum method, string body, string serverName, string serverAction, string serverRoute, string serverRouteParam )
         {
-            return await this.HandleRequestInternal( method, serverName, serverAction, serverRoute, serverRouteParam, body );
+            return await this.HandleRequestInternal( open, method, serverName, serverAction, serverRoute, serverRouteParam, body );
         }
 
-        private async Task<RequestHandlerResponse> HandleRequestInternal( HttpMethodEnum method, string serverName, string serverAction = null, string serverRoute = null, string serverRouteParam = null, string body = null )
+        private async Task<RequestHandlerResponse> HandleRequestInternal( bool open, HttpMethodEnum method, string serverName, string serverAction = null, string serverRoute = null, string serverRouteParam = null, string body = null )
         {
             var queryString = this.httpContext.HttpContext.Request.QueryString.HasValue ? this.httpContext.HttpContext.Request.QueryString.Value : string.Empty;
             var serverConfig = this.serverConfigurationHandler.GetServerConfiguration( serverName );
@@ -98,6 +98,11 @@
 
             var routeConfig = serverConfig.RouteConfiguration.FirstOrDefault( x =>
             {
+                if ( x.NeedAuthorization && open )
+                {
+                    return false;
+                }
+
                 if ( x.Method.Equals( method ) )
                 {
                     var configRoute = x.Route.StartsWith( "/" ) ? x.Route.Substring( 1 ) : x.Route;
@@ -133,7 +138,7 @@
                 };
             }
 
-            if ( ( this.userContext == null || this.userContext.Claim == Claims.NotLogged ) && routeConfig.NeedAuthorization )
+            if ( routeConfig.NeedAuthorization && ( open || this.userContext == null || this.userContext.Claim == Claims.NotLogged ) )
             {
                 this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                 return new RequestHandlerResponse
@@ -150,32 +155,48 @@
                 };
             }
 
-            if ( this.userContext != null && this.userContext.Claim != Claims.NotLogged )
+            if ( routeConfig.NeedAuthorization )
             {
                 //validate user session and claims, extend session
-                var sessionResponse = await KRFRestHandler.RequestHttp<IUserContext, CheckSessionResult>( new KRFHttpRequestWithBody<IUserContext>
+                if ( this.gatewaySettings.SessionServerEnabled && this.gatewaySettings.SessionServerSettings != null )
                 {
-                    Url = this.sessionServer.CheckSessionUrl,
-                    CertificateKey = this.sessionServer.CertificateKey,
-                    CertificatePath = this.sessionServer.CertificatePath,
-                    ForceDisableSSL = this.sessionServer.ForceDisableSSL,
-                    Method = HttpMethodEnum.POST,
-                    Timeout = this.sessionServer.Timeout,
-                    Body = this.userContext
-                } );
-
-                if ( sessionResponse.HasError || !sessionResponse.Response.Success )
-                {
-                    this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
-                    return new RequestHandlerResponse
+                    var sessionResponse = await KRFRestHandler.RequestHttp<IUserContext, CheckSessionResult>( new KRFHttpRequestWithBody<IUserContext>
                     {
-                        Error = sessionResponse.HasError ? sessionResponse.Error : sessionResponse.Error,
-                        HttpStatusCode = sessionResponse.HttpStatus
-                    };
+                        Url = this.gatewaySettings.SessionServerSettings.CheckSessionUrl,
+                        CertificateKey = this.gatewaySettings.SessionServerSettings.CertificateKey,
+                        CertificatePath = this.gatewaySettings.SessionServerSettings.CertificatePath,
+                        ForceDisableSSL = this.gatewaySettings.SessionServerSettings.ForceDisableSSL,
+                        Method = HttpMethodEnum.POST,
+                        Timeout = this.gatewaySettings.SessionServerSettings.Timeout,
+                        Body = this.userContext
+                    } );
+
+                    if ( sessionResponse.HasError || !sessionResponse.Response.Success )
+                    {
+                        this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                        return new RequestHandlerResponse
+                        {
+                            Error = sessionResponse.HasError ? sessionResponse.Error : sessionResponse.Error,
+                            HttpStatusCode = sessionResponse.HttpStatus
+                        };
+                    }
                 }
 
-                //generate api specific token
-                token = KRFJwt.GetSignedBearerTokenFromContext( this.userContext, serverConfig.InternalTokenKey, DateTime.Now.AddMinutes( 5 ) );
+                //use same token
+                if ( this.gatewaySettings.AppConfiguration.TokenKey.Equals( serverConfig.InternalTokenKey ) )
+                {
+                    token = this.httpContext.HttpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
+                }
+                else
+                {
+                    //generate api specific token and copy expiration if no override setting is available
+                    token = KRFJwt.GetSignedBearerTokenFromContext(
+                        this.userContext,
+                        serverConfig.InternalTokenKey,
+                        serverConfig.TokenExpirationMinutes.HasValue
+                            ? DateTime.Now.AddMinutes( serverConfig.TokenExpirationMinutes.Value )
+                            : this.userContext.TokenExpiration );
+                }
             }
 
             //Call api
@@ -185,8 +206,8 @@
                 CertificateKey = serverConfig.CertificateKey,
                 CertificatePath = serverConfig.CertificatePath,
                 ForceDisableSSL = serverConfig.ForceDisableSSL,
-                KRFBearerToken = token,
-                KRFBearerTokenHeader = serverConfig.InternalTokenIdentifier,
+                BearerToken = token,
+                BearerTokenHeader = serverConfig.InternalTokenIdentifier,
                 Method = method,
                 QueryString = queryString,
                 Route = route,

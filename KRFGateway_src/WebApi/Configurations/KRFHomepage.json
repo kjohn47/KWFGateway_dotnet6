@@ -3,6 +3,7 @@
   "ServerUrl": "https://localhost:14747",
   "InternalTokenKey": "APICOMMONSIGNEDKEY",
   "InternalTokenIdentifier": "AccessToken",
+  "TokenExpirationMinutes": null,
   "ForceDisableSSL": true,
   "RouteConfiguration": [
     {

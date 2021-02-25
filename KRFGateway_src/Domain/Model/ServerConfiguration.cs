@@ -12,6 +12,7 @@ namespace KRFGateway.Domain.Model
         public string CertificatePath { get; set; }
         public string CertificateKey { get; set; }
         public int? RequestTimeOut { get; set; }
+        public int? TokenExpirationMinutes { get; set; }
         public IEnumerable<RouteConfiguration> RouteConfiguration { get; set; }
     }
 }
