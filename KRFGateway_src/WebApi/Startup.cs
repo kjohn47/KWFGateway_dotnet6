@@ -25,16 +25,10 @@ namespace KRFGateway.WebApi
         {
             this.Configuration = configuration;
             this._apiSettings = configuration.GetSection( KRFApiSettings.AppConfiguration_Key ).Get<AppConfiguration>();
-            this._requestContext = configuration.GetSection( KRFApiSettings.RequestContext_Key ).Get<RequestContext>();
-            this._enableLogs = configuration.GetValue( KRFApiSettings.LogsOnPrd_Key, false );
-            this._sessionServer = configuration.GetSection( AppConstants.SessionServerKey ).Get<SessionServer>();
             this.HostingEnvironment = env;
         }
 
         private readonly AppConfiguration _apiSettings;
-        private readonly RequestContext _requestContext;
-        private readonly bool _enableLogs;
-        private readonly SessionServer _sessionServer;
 
         public IWebHostEnvironment HostingEnvironment { get; }
         public IConfiguration Configuration { get; }
@@ -45,24 +39,24 @@ namespace KRFGateway.WebApi
             //Add logger config
             services.AddLogging( l =>
             {
-                var config = this.Configuration.GetSection( KRFApiSettings.Logging_Key );
-                l.ClearProviders();
-                l.AddConfiguration( config );
-                l.AddConsole();
-                l.AddDebug();
-                l.AddEventLog();
-                l.AddEventSourceLogger();
-                l.AddKRFLogToFileLogger( this.Configuration.GetSection( KRFApiSettings.KRFLoggerConfig_Key ) );
+                l.AddKRFLogger( this.Configuration );
             } );
 
-            services.InjectUserContext( this._apiSettings.TokenIdentifier, this._apiSettings.TokenKey );
+            services.AddUserBearerContext( this._apiSettings );
 
             services.AddKRFController();
 
-            services.SwaggerInit( this._apiSettings.ApiName, this._apiSettings.TokenIdentifier );
+            services.SwaggerInit( this._apiSettings );
 
             services.AddSingleton<IServerConfigurationHandler>( new ServerConfigurationHandler( this.Configuration.GetValue<string>( AppConstants.ConfigurationPathKey, "Configurations" ) ) );
-            services.AddSingleton( _sessionServer );
+
+            services.AddSingleton( new GatewaySettings
+            {
+                AppConfiguration = this._apiSettings,
+                SessionServerEnabled = this.Configuration.GetValue<bool>( AppConstants.SessionServerKey, false ),
+                SessionServerSettings = this.Configuration.GetSection( AppConstants.SessionServerKey ).Get<SessionServer>()
+            } );
+
             services.AddScoped<IRouteHandler, RouteHandler>();
         }
 
@@ -77,18 +71,13 @@ namespace KRFGateway.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.KRFLogAndExceptionHandlerConfigure(
-            loggerFactory,
-            ( this._enableLogs || isDev ),
-            this._apiSettings.ApiName,
-            this._apiSettings.TokenIdentifier,
-            this._requestContext.EnableRequestRead );
+            app.KRFLogAndExceptionHandlerConfigure( loggerFactory, this._apiSettings, isDev );
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.AuthConfigure();
+            app.AuthConfigure( !isDev );
 
             app.UseEndpoints( endpoints =>
             {

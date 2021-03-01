@@ -7,22 +7,28 @@
     using KRFCommon.Controller;
     using KRFCommon.Proxy;
 
-    using KRFGateway.App.Constants;
     using KRFGateway.App.Handler;
     using KRFGateway.Domain.Model;
 
     using Microsoft.AspNetCore.Mvc;
 
-    [ApiController]
-    [Route( AppConstants.RouteVersion )]
-    public class GatewayController : KRFController
+    public abstract class BaseGatewayController : KRFController
     {
+        private readonly bool isOpen = false;
+
+        public BaseGatewayController()
+        { }
+        public BaseGatewayController( bool isOpen )
+        {
+            this.isOpen = isOpen;
+        }
+
         [HttpGet( "{serverName}" )]
         public async Task<IActionResult> GetServer(
             [FromServices] IRouteHandler routeHandler,
             [FromRoute] string serverName )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.GET, serverName ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.GET, serverName ) );
         }
 
         [HttpGet( "{serverName}/{serverAction}" )]
@@ -31,7 +37,7 @@
         [FromRoute] string serverName,
         [FromRoute] string serverAction )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.GET, serverName, serverAction ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.GET, serverName, serverAction ) );
         }
 
         [HttpGet( "{serverName}/{serverAction}/{serverRoute}" )]
@@ -41,7 +47,7 @@
         [FromRoute] string serverAction,
         [FromRoute] string serverRoute )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.GET, serverName, serverAction, serverRoute ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.GET, serverName, serverAction, serverRoute ) );
         }
 
         [HttpGet( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
@@ -52,7 +58,7 @@
         [FromRoute] string serverRoute,
         [FromRoute] string serverRouteParam )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.GET, serverName, serverAction, serverRoute, serverRouteParam ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.GET, serverName, serverAction, serverRoute, serverRouteParam ) );
         }
 
         [HttpPost( "{serverName}" )]
@@ -61,7 +67,7 @@
         [FromRoute] string serverName,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.POST, body?.ToString(), serverName ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.POST, body?.ToString(), serverName ) );
         }
 
         [HttpPost( "{serverName}/{serverAction}" )]
@@ -71,7 +77,7 @@
         [FromRoute] string serverAction,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.POST, body?.ToString(), serverName, serverAction ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.POST, body?.ToString(), serverName, serverAction ) );
         }
 
         [HttpPost( "{serverName}/{serverAction}/{serverRoute}" )]
@@ -82,7 +88,7 @@
         [FromRoute] string serverRoute,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.POST, body?.ToString(), serverName, serverAction, serverRoute ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.POST, body?.ToString(), serverName, serverAction, serverRoute ) );
         }
         [HttpPost( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
         public async Task<IActionResult> PostServerActionRouteParam(
@@ -93,7 +99,7 @@
         [FromRoute] string serverRouteParam,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.POST, body?.ToString(), serverName, serverAction, serverRoute, serverRouteParam ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.POST, body?.ToString(), serverName, serverAction, serverRoute, serverRouteParam ) );
         }
 
         [HttpPut( "{serverName}" )]
@@ -102,7 +108,7 @@
         [FromRoute] string serverName,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.PUT, body?.ToString(), serverName ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.PUT, body?.ToString(), serverName ) );
         }
 
         [HttpPut( "{serverName}/{serverAction}" )]
@@ -112,7 +118,7 @@
         [FromRoute] string serverAction,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction ) );
         }
 
         [HttpPut( "{serverName}/{serverAction}/{serverRoute}" )]
@@ -123,7 +129,7 @@
         [FromRoute] string serverRoute,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction, serverRoute ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction, serverRoute ) );
         }
 
         [HttpPut( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
@@ -135,7 +141,7 @@
         [FromRoute] string serverRouteParam,
         [FromBody] JsonElement? body )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction, serverRoute, serverRouteParam ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequestWithBody( isOpen, HttpMethodEnum.PUT, body?.ToString(), serverName, serverAction, serverRoute, serverRouteParam ) );
         }
 
         [HttpDelete( "{serverName}" )]
@@ -143,7 +149,7 @@
         [FromServices] IRouteHandler routeHandler,
         [FromRoute] string serverName )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.DELETE, serverName ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.DELETE, serverName ) );
         }
 
         [HttpDelete( "{serverName}/{serverAction}" )]
@@ -152,7 +158,7 @@
         [FromRoute] string serverName,
         [FromRoute] string serverAction )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.DELETE, serverName, serverAction ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.DELETE, serverName, serverAction ) );
         }
 
         [HttpDelete( "{serverName}/{serverAction}/{serverRoute}" )]
@@ -162,7 +168,7 @@
         [FromRoute] string serverAction,
         [FromRoute] string serverRoute )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.DELETE, serverName, serverAction, serverRoute ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.DELETE, serverName, serverAction, serverRoute ) );
         }
 
         [HttpDelete( "{serverName}/{serverAction}/{serverRoute}/{serverRouteParam}" )]
@@ -173,10 +179,10 @@
         [FromRoute] string serverRoute,
         [FromRoute] string serverRouteParam )
         {
-            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( HttpMethodEnum.DELETE, serverName, serverAction, serverRoute, serverRouteParam ) );
+            return await this.ProcessRequestAsync( () => routeHandler.HandleRequest( isOpen, HttpMethodEnum.DELETE, serverName, serverAction, serverRoute, serverRouteParam ) );
         }
 
-        private async Task<ObjectResult> ProcessRequestAsync(Func<Task<RequestHandlerResponse>> request)
+        private async Task<ObjectResult> ProcessRequestAsync( Func<Task<RequestHandlerResponse>> request )
         {
             var response = await request();
 
