@@ -198,6 +198,12 @@
                             : this.userContext.TokenExpiration );
                 }
             }
+            else if ( open && serverConfig.CopyJWTFromRequestOnOpenRoute &&
+                this.gatewaySettings.AppConfiguration.TokenKey.Equals( serverConfig.InternalTokenKey ) &&
+                this.httpContext.HttpContext.Request.Headers.ContainsKey( this.gatewaySettings.AppConfiguration.TokenIdentifier ) )
+            {
+                token = this.httpContext.HttpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
+            }
 
             //Call api
             var response = await KRFRestHandler.RequestHttp<string, object>( new KRFHttpRequestWithBody<string>
