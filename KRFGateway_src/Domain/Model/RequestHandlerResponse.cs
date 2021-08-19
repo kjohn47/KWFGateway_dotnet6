@@ -15,6 +15,6 @@ namespace KRFGateway.Domain.Model
 
         public bool HasError => this.Error != null;
 
-        public int GetStatusCode => this.HttpStatusCode.HasValue ? ( int ) this.HttpStatusCode.Value : this.HasError ? this.Error.ErrorStatusCode : 200;
+        public int GetStatusCode => this.HttpStatusCode.HasValue ? ( int ) this.HttpStatusCode.Value : this.HasError ? ( int ) this.Error.ErrorStatusCode : 200;
     }
 }

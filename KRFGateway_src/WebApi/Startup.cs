@@ -71,18 +71,7 @@ namespace KRFGateway.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.KRFLogAndExceptionHandlerConfigure( loggerFactory, this._apiSettings, isDev );
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.AuthConfigure( !isDev );
-
-            app.UseEndpoints( endpoints =>
-            {
-                endpoints.MapControllers();
-            } );
+            app.ApiConfigure( this._apiSettings, loggerFactory, isDev );
 
             app.SwaggerConfigure( this._apiSettings.ApiName );
         }
