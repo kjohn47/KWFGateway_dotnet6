@@ -18,15 +18,15 @@
     public class RouteHandler : IRouteHandler
     {
         private readonly IServerConfigurationHandler serverConfigurationHandler;
-        private readonly IHttpContextAccessor httpContext;
+        private readonly HttpContext httpContext;
         private readonly IUserContext userContext;
         private readonly GatewaySettings gatewaySettings;
 
-        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContext _userContext, GatewaySettings _gatewaySettings )
+        public RouteHandler( IServerConfigurationHandler _serverConfigurationHandler, IHttpContextAccessor _httpContext, IUserContextBuilder _userContext, GatewaySettings _gatewaySettings )
         {
             this.serverConfigurationHandler = _serverConfigurationHandler;
-            this.httpContext = _httpContext;
-            this.userContext = _userContext;
+            this.httpContext = _httpContext.HttpContext;
+            this.userContext = _userContext.GetContext();
             this.gatewaySettings = _gatewaySettings;
         }
 
@@ -72,7 +72,7 @@
 
         private async Task<RequestHandlerResponse> HandleRequestInternal( bool open, HttpMethodEnum method, string serverName, string serverAction = null, string serverRoute = null, string serverRouteParam = null, string body = null )
         {
-            var queryString = this.httpContext.HttpContext.Request.QueryString.HasValue ? this.httpContext.HttpContext.Request.QueryString.Value : string.Empty;
+            var queryString = this.httpContext.Request.QueryString.HasValue ? this.httpContext.Request.QueryString.Value : string.Empty;
             var serverConfig = this.serverConfigurationHandler.GetServerConfiguration( serverName );
             string token = null;
             var route = $"{serverName}";
@@ -140,7 +140,7 @@
 
             if ( routeConfig.NeedAuthorization && ( open || this.userContext == null || this.userContext.Claim == Claims.NotLogged ) )
             {
-                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                this.httpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                 return new RequestHandlerResponse
                 {
                     Error = new ErrorOut( HttpStatusCode.Unauthorized, "You need to be authenticated to access that route", ResponseErrorType.Application )
@@ -173,7 +173,7 @@
 
                     if ( sessionResponse.HasError || !sessionResponse.Response.Success )
                     {
-                        this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
+                        this.httpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, "Bearer Failed authentication" );
                         return new RequestHandlerResponse
                         {
                             Error = sessionResponse.HasError ? sessionResponse.Error : sessionResponse.Error,
@@ -185,7 +185,7 @@
                 //use same token
                 if ( this.gatewaySettings.AppConfiguration.TokenKey.Equals( serverConfig.InternalTokenKey ) )
                 {
-                    token = this.httpContext.HttpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
+                    token = this.httpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
                 }
                 else
                 {
@@ -200,9 +200,9 @@
             }
             else if ( open && serverConfig.CopyJWTFromRequestOnOpenRoute &&
                 this.gatewaySettings.AppConfiguration.TokenKey.Equals( serverConfig.InternalTokenKey ) &&
-                this.httpContext.HttpContext.Request.Headers.ContainsKey( this.gatewaySettings.AppConfiguration.TokenIdentifier ) )
+                this.httpContext.Request.Headers.ContainsKey( this.gatewaySettings.AppConfiguration.TokenIdentifier ) )
             {
-                token = this.httpContext.HttpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
+                token = this.httpContext.Request.Headers[ this.gatewaySettings.AppConfiguration.TokenIdentifier ].ElementAt( 0 );
             }
 
             //Call api
@@ -223,7 +223,7 @@
 
             if ( response?.ResponseHeaders?.WwwAuthenticate?.Count > 0 )
             {
-                this.httpContext.HttpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.ResponseHeaders.WwwAuthenticate.First().ToString() );
+                this.httpContext.Response.Headers.Append( KRFConstants.AuthenticateHeader, response.ResponseHeaders.WwwAuthenticate.First().ToString() );
             }
 
             return new RequestHandlerResponse
