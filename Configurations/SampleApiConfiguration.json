@@ -1,0 +1,15 @@
+{
+  "ApiBaseUrl": "https://localhost",
+  "ServiceName": "sample-api",
+  "Ports": [
+    14747
+  ],
+  "Timeout": 15000,
+  "AuthorizationRequired": false,
+  "CertificateConfiguration": null,
+  "RouteConfiguration": [
+    {
+      "Pattern": "/**"
+    }
+  ]
+}

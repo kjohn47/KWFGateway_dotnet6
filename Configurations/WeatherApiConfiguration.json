@@ -1,0 +1,24 @@
+{
+  "ApiBaseUrl": "https://localhost",
+  "ServiceName": "weather-api",
+  "Ports": [
+    7075
+  ],
+  "Timeout": 15000,
+  "AuthorizationRequired": false,
+  "CertificateConfiguration": {
+    "CertificateType": "ForceDisableRequirement",
+    "SslProtocols": "None"
+  },
+  "RouteConfiguration": [
+    {
+      "Pattern": "/*",
+      "Method": "GET"
+    },
+    {
+      "Pattern": "/weatherforecast",
+      "Method": "POST",
+      "RequireAuthorization": true
+    }
+  ]
+}
