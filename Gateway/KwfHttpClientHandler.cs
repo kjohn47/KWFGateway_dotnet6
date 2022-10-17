@@ -7,12 +7,12 @@
     using Microsoft.Extensions.Logging;
 
     using System;
-    using System.Diagnostics;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Net.Mime;
     using System.Text;
+    using System.Text.Json;
 
     public class KwfHttpClientHandler : IKwfHttpClientHandler
     {
@@ -20,17 +20,20 @@
         private readonly IAuthorizationHandler _authorizationHandler;
         private readonly IHttpClientFactory _HttpClientFactory;
         private readonly ILogger<KwfHttpClientHandler> _logger;
+        private readonly bool _logsEnabled;
 
         public KwfHttpClientHandler(
             IHttpClientFactory httpClientFactory,
             IGatewayConfigurationHandler gatewayConfigurationHandler, 
             IAuthorizationHandler authorizationHandler,
-            ILogger<KwfHttpClientHandler> logger)
+            ILogger<KwfHttpClientHandler> logger,
+            IConfiguration configuration)
         {
             _gatewayConfigurationHandler = gatewayConfigurationHandler;
             _authorizationHandler = authorizationHandler;
             _HttpClientFactory = httpClientFactory;
             _logger = logger;
+            _logsEnabled = configuration.GetValue<bool>("EnableHttpClientLogs");
         }
 
         public async Task<HttpResponseMessage> CallEndpoint(HttpContext context)
@@ -79,10 +82,30 @@
                 RequestUri = GetRequestUrl(urlParts, context.Request.QueryString)
             };
 
-            await PopulateRequestBody(requestMessage, method, context);
+            await PopulateAndLogRequestBody(requestMessage, method, context, client.BaseAddress);
             PopulateRequestHeaders(requestMessage, context, authorizationRequired, hasAuthorizationHeader, config.Value.AuthorizationHeader, bearerToken);
 
-            return await client.SendAsync(requestMessage, context.RequestAborted);
+            var clientResponse = await client.SendAsync(requestMessage, context.RequestAborted);
+
+            if (_logsEnabled)
+            {
+                var responseBody = string.Empty;
+                var mediaType = clientResponse.Content?.Headers?.ContentType?.MediaType;
+
+                if (clientResponse.Content != null && (mediaType == MediaTypeNames.Text.Plain || mediaType == MediaTypeNames.Text.RichText || mediaType == MediaTypeNames.Application.Json))
+                {
+                    responseBody = await clientResponse.Content.ReadAsStringAsync();
+                }
+
+                _logger.LogInformation(
+                        "Response:\nMethod:{method}\nURL: {endpoint}\nStatusCode: {httpStatusCode}\nBody: {responseBody}",
+                        clientResponse.RequestMessage?.Method?.Method,
+                        clientResponse.RequestMessage?.RequestUri?.ToString(),
+                        clientResponse.StatusCode,
+                        responseBody);
+            }
+
+            return clientResponse;
         }
 
         private HttpClient GetClientByKey(string key)
@@ -90,7 +113,7 @@
             return _HttpClientFactory.CreateClient(key);
         }
 
-        private static async Task PopulateRequestBody(HttpRequestMessage requestMessage, HttpMethod method, HttpContext context)
+        private async Task PopulateAndLogRequestBody(HttpRequestMessage requestMessage, HttpMethod method, HttpContext context, Uri? clientUri)
         {
             if (method == HttpMethod.Post || method == HttpMethod.Put)
             {
@@ -123,12 +146,46 @@
 
                         requestMessage.Content = content;
                     }
+
+                    if (_logsEnabled)
+                    {
+                        _logger.LogInformation(
+                            "Request:\nMethod: {method}\nURL: {client}/{endpoint}\nContent-type: {contentType}\nForm params: {formParams}",
+                            method.Method,
+                            clientUri?.ToString(),
+                            requestMessage.RequestUri?.ToString(),
+                            requestMessage.Content.Headers?.ContentType?.MediaType,
+                            JsonSerializer.Serialize(context.Request.Form));
+                    }
                 }
                 else
                 {
                     using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-                    requestMessage.Content = new StringContent(await reader.ReadToEndAsync(), Encoding.UTF8, context.Request.ContentType ?? MediaTypeNames.Text.Plain);
+                    var reqBody = await reader.ReadToEndAsync();
+                    requestMessage.Content = new StringContent(reqBody, Encoding.UTF8, context.Request.ContentType ?? MediaTypeNames.Text.Plain);
+
+                    if (_logsEnabled)
+                    {
+                        _logger.LogInformation(
+                            "Request:\nMethod: {method}\nURL: {client}/{endpoint}\nContent-type: {contentType}\nRequest Body: {requestBody}",
+                            method.Method,
+                            clientUri?.ToString(),
+                            requestMessage.RequestUri?.ToString(),
+                            requestMessage.Content.Headers?.ContentType?.MediaType,
+                            reqBody);
+                    }
                 }
+
+                return;
+            }
+
+            if (_logsEnabled)
+            {
+                _logger.LogInformation(
+                    "Request:\nMethod: {method}\nURL: {client}/{endpoint}",
+                    method.Method,
+                    clientUri?.ToString(),
+                    requestMessage.RequestUri?.ToString());
             }
         }
 

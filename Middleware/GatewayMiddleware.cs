@@ -1,7 +1,8 @@
 ﻿namespace KWFGateway.Middleware
 {
     using KWFGateway.Gateway;
-    using Microsoft.Extensions.Primitives;
+
+    using Microsoft.AspNetCore.Http;
 
     using System.Net;
 
@@ -9,11 +10,15 @@
     {
         private readonly RequestDelegate _next;
         private readonly IKwfHttpClientHandler _httpClientHandler;
+        private readonly ILogger<GatewayMiddleware> _logger;
+        private readonly bool _logsEnabled;
 
-        public GatewayMiddleware(RequestDelegate next, IKwfHttpClientHandler httpClientHandler)
+        public GatewayMiddleware(RequestDelegate next, IKwfHttpClientHandler httpClientHandler, ILogger<GatewayMiddleware> logger, IConfiguration configuration)
         {
             _next = next;
             _httpClientHandler = httpClientHandler;
+            _logger = logger;
+            _logsEnabled = configuration.GetValue<bool>("EnableGatewayLogs");
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -30,49 +35,71 @@
                 var apiResponse = await _httpClientHandler.CallEndpoint(context);
                 context.Response.StatusCode = (int)apiResponse.StatusCode;
                 CopyApiResponseHeaders(context, apiResponse);
+                await context.Response.StartAsync(context.RequestAborted);
                 await apiResponse.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
+                await context.Response.CompleteAsync();
+                return;
             }
             catch (Exception ex)
             {
-                if (ex is HttpRequestException)
+                if (ex is GatewayException gwException)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
+                    await ReturnResponse(context, gwException.HttpStatus, ex, gwException.Message);
                     return;
                 }
 
-                if (ex is GatewayException gwException)
+                if (ex is HttpRequestException)
                 {
-                    //do stuff
-                    context.Response.StatusCode = (int)gwException.HttpStatus;
-                    await context.Response.WriteAsync(gwException.Message);
+                    await ReturnResponse(context, HttpStatusCode.ServiceUnavailable, ex);
                     return;
                 }
 
                 if (ex is TimeoutException || (ex != null && ex.InnerException is TimeoutException))
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.GatewayTimeout;
+                    await ReturnResponse(context, HttpStatusCode.GatewayTimeout, ex);
                     return;
                 }
 
                 if (ex is WebException || (ex != null && ex.InnerException is WebException))
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    return;
-                }                
-
-                if (ex is OperationCanceledException)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.Accepted;
+                    await ReturnResponse(context, HttpStatusCode.InternalServerError, ex);
                     return;
                 }
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
+                if (ex is OperationCanceledException)
+                {
+                    await ReturnResponse(context, HttpStatusCode.Accepted, ex);
+                    return;
+                }
 
-            return;
+                await ReturnResponse(context, HttpStatusCode.InternalServerError, ex);
+                return;
+            }
         }
 
-        private void CopyApiResponseHeaders(HttpContext context, HttpResponseMessage apiResponseMessage)
+        private async Task ReturnResponse(HttpContext context, HttpStatusCode httpStatusCode, Exception? ex, string? message = null)
+        {
+            if (_logsEnabled)
+            {
+                _logger.LogError(ex, "Exception occurred: {exceptionMessage}", message ?? string.Empty);
+            }
+
+            context.Response.StatusCode = (int)httpStatusCode;
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                await context.Response.StartAsync(context.RequestAborted);
+                await context.Response.WriteAsync(message);
+                await context.Response.CompleteAsync();
+                return;
+            }
+
+            await context.Response.StartAsync(context.RequestAborted);
+            await context.Response.BodyWriter.WriteAsync(null);
+            await context.Response.CompleteAsync();
+        }
+
+        private static void CopyApiResponseHeaders(HttpContext context, HttpResponseMessage apiResponseMessage)
         {
             foreach (var header in apiResponseMessage.Headers)
             {
@@ -83,6 +110,8 @@
             {
                 context.Response.Headers[header.Key] = header.Value.ToArray();
             }
+            //TODO;
+            context.Response.Headers.Add("Content-Security-Policy", "default-src *; img-src * 'self' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;style-src 'self' 'unsafe-inline' * ");
             context.Response.Headers.Remove("transfer-encoding");
         }
     }
