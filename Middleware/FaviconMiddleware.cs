@@ -1,9 +1,13 @@
 ﻿namespace KWFGateway.Middleware
 {
     using KWFGateway.Common;
+    using KWFGateway.Gateway;
+
     using Microsoft.Extensions.Configuration;
 
     using System.Net;
+    using System.Net.Http.Headers;
+    using System.Net.Mime;
 
     public class FaviconMiddleware
     {
@@ -60,8 +64,8 @@
                 }
 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
-                context.Response.Headers.ContentType = "image/x-icon";
-                context.Response.Headers.Add("Content-Security-Policy", "default-src *; img-src * 'self' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;style-src 'self' 'unsafe-inline' * ");
+                context.Response.Headers.ContentType = Constants.IconMediaType;
+                context.Response.Headers.Add(Constants.CspHeader);
                 context.Response.ContentLength = _faviconBytes.Length;
                 await context.Response.StartAsync(context.RequestAborted);
                 await context.Response.BodyWriter.WriteAsync(_faviconBytes, context.RequestAborted);
