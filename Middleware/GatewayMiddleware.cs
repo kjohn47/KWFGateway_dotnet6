@@ -111,7 +111,7 @@
                 context.Response.Headers[header.Key] = header.Value.ToArray();
             }
             //TODO;
-            context.Response.Headers.Add("Content-Security-Policy", "default-src *; img-src * 'self' data: https: http:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;style-src 'self' 'unsafe-inline' * ");
+            context.Response.Headers.Add(Constants.CspHeader);
             context.Response.Headers.Remove("transfer-encoding");
         }
     }
